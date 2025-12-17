@@ -1,5 +1,6 @@
 # Python
 __pycache__/
+*/__pycache/
 *.py[cod]
 
 # Virtual environments
@@ -19,5 +20,4 @@ allure-report/
 .vscode/
 .idea/
 
-README.MD
 .gitignore
