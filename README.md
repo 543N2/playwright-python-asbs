@@ -134,3 +134,25 @@ The test file should be in tests/ folder.
 ```bash
 touch tests/test_login_orangehrm.py
 ```
+
+## Trace Viewer
+
+Is a GUI tool that records traces of the executed tests, able to replay and inspect visually every performed action, as a visual debugging tool.
+
+Usage:
+
+```bash
+pytest --tracing=on
+```
+
+Possible values: `on`, `off`, `retain-on-failure`.
+
+This will record the trace an place it in `test-results/trace-zip` as long as the default fixtures for `page`and `browser` are being used (and not overriden).
+
+To open the trace:
+
+```bash
+playwright show-trace <path-to-trace.zip>
+```
+
+or open the zip file in `trace.playwright.dev`.
