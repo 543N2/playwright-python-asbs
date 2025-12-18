@@ -258,3 +258,47 @@ assert response.ok
 request_context.dispose()
 ```
 
+
+## Data Driven Testing
+
+1. Create a simple test that uses some data.
+
+2. Parametrize the test, passing values to the variables using `@pytest.mark.parametrize()` fixture.
+
+A CSV file can be used:
+
+1. Create and fill a test data file in csv format
+```bash
+mkdir test_data
+touch data.csv
+```
+
+2. Create a function to read data from cvs file
+
+```python
+def get_csv_data():
+    data = []
+    with open("test_data/data.csv", newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            data.append(row)
+    return data
+```
+
+A JSON file can be used as well:
+
+1. Create and fill the JSON file.
+```bash
+touch test_data/data.json
+```
+
+2. Create a function to read data from json file.
+```python
+def get_json_data() -> list:
+    import json
+    with open("./test_data/data.json", "r") as jsonfile:
+       data = json.load(jsonfile)
+    return [(item["username"], item["password"]) for item in data]
+```
+
+3. Run the tests. All data should be added up automatically.
