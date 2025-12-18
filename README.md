@@ -77,8 +77,6 @@ pytest
 
 ## Recording
 
-
-
 1. Go to project root folder in terminal.
 
 2. Run: 
@@ -95,6 +93,24 @@ playwright codegen <url> --target python -o test_recorded_script.py
 ```
 
 ## Page Object Model
+
+1. Create a file per page in pages/ folder.
+```bash
+touch pages/orangehrm_login_page.py
+```
+
+2. The file must contain a page class with the constructor.
+
+3. Add locators for all the objects tha will be used.
+
+4. Add the action methods to perform actions on objects.
+
+5. Use the classes in the tests and update scripts to use page class methods.
+
+The test file should be in tests/ folder.
+```bash
+touch tests/test_login_orangehrm.py
+```
 
 Without POM:
 - Objects are not reusable
@@ -115,25 +131,8 @@ How it helps:
 - Maintainability
 - Clean Code
 
-How to:
 
-1. Create a file per page in pages/ folder.
-```bash
-touch pages/orangehrm_login_page.py
-```
 
-2. The file must contain a page class with the constructor.
-
-3. Add locators for all the objects tha will be used.
-
-4. Add the action methods to perform actions on objects.
-
-5. Use the classes in the tests and update scripts to use page class methods.
-
-The test file should be in tests/ folder.
-```bash
-touch tests/test_login_orangehrm.py
-```
 
 ## Trace Viewer
 
@@ -156,3 +155,106 @@ playwright show-trace <path-to-trace.zip>
 ```
 
 or open the zip file in `trace.playwright.dev`.
+
+
+## API Testing
+
+The function that contains the test, must include `(playwright)` as argument.
+
+
+1. Create a request context
+
+An HTTP client is created using `APIRequestContext`:
+
+```python
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    request_context = p.request.new_context()
+```
+Or if `pytest-playwright` is used this version can be used:
+```python
+def test_api_get_request(playwright):
+    request = playwright.request.new_context()
+```
+The HTTP client may take headers:
+```python
+request = playwright.request.new_context(
+    extra_http_headers={
+        "Accept": "application/json",
+        "Authorization": "Bearer <access_token>",
+        "X-Api-Key": "reqres-free-v1"
+    }
+)
+```
+
+2. Make an API call using HTTP methods of `APIRequestContext`:
+
+`APIRequestContext` class provides methods to send HTTP requests including: 
+- .get() 
+- .post()
+- .put()
+- .delete()
+
+It's used for:
+- Sending direct requests to API endpoints.
+- Avoid loading the whole browser.
+- Test APIs quickly and easily.
+- Can be used standalone or along with UI tests
+
+A GET request:
+```python
+response = request_context.get(<URL>)
+```
+
+It may have included headers:
+```python
+response = request.get(<URL>, headers={<required_headers>})
+``` 
+
+A POST HTTP request method:
+```python
+response = request_context.post(
+    <URL>,
+    data={
+        "<key1>": "<value1>",
+        "<key2>": "<value2>",
+    })
+```
+
+
+3. Use the response
+
+To convert the data to json:
+```python
+json_data = response.json()
+```
+
+To evaluate conditions and assert responses:
+```python
+assert response.status == 200
+``` 
+
+JSON path finder can be used to assert specific response items:
+```python
+assert json_data[<key-1>][<key2>][<key-3>] == <value>
+```
+
+Return types:
+- `response.status`: Status code
+- `response.ok`: True if status is 2xx
+- `response.json()`: Parse response body to Python dictionary 
+- `response.text()`: Get raw response as text
+- `response.body()`: Get response as bytes
+
+```python
+print(response.status)
+print(response.json())
+assert response.ok
+```
+
+4. Dispose context
+```python
+request_context.dispose()
+```
+
